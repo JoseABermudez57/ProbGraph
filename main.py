@@ -1,14 +1,15 @@
 from tkinter import Tk, Button, Label, filedialog
-
+import pandas as pd
 
 def open_files():
     root = Tk()
     root.withdraw()
 
-    file = filedialog.askopenfile()  # Open the dialog box
+    file = filedialog.askopenfile(filetypes=[('CSV Files', '*.csv')])  # Open the dialog box
     if file:
         # Open file process
-        content = file.read()
+        content = pd.read_csv(file, delimiter=';')
+        attributes = content.columns[0].replace('"', '').split(';')
         print(content)
         file.close()
 
