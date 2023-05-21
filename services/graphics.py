@@ -13,7 +13,7 @@ def warhead_graph(data):
 
 def bar_graph(data, canvas):
     plt.clf()
-    plt.bar(data, height=100, width=1)
+    plt.barh(data, height=1, width=10000)
     canvas.draw()
 
 def pie_chart(data, canvas):
