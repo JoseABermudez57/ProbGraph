@@ -27,27 +27,19 @@ def open_files():
             column_values = content[selected_column]
             graphs = combobox_graph.get()
             if graphs == "Histograma":
-                total_value = nc.total_value(column_values.value_counts().values.sum())
+                total_value = nc.total_value(column_values.value_counts().__len__())
                 number_class = nc.number_class(total_value)
                 range_method = nc.range_method(column_values.value_counts())
                 class_width = nc.class_width(range_method, number_class)
                 lower_limits = nc.limit_inf(column_values.value_counts().sort_values(ascending=False), class_width)
                 upper_limits = nc.limit_sup(lower_limits, class_width)
+                upper_limits[-1] = max(column_values.value_counts())
                 class_marks = nc.class_marks(lower_limits, upper_limits)
-                print(total_value)
-                print("--------")
-                print(column_values.value_counts())
-                print("--------")
-                print(number_class)
-                print("--------")
-                print(class_marks)
-                print("-----")
                 frec_absolute = nc.frec_absolute(column_values.value_counts(), number_class, class_width)
-                print(frec_absolute)
                 graphics.histogram_plot(frec_absolute, class_marks, canvas)
             elif graphs == "Polígono de frecuencias":
-                graphics.frequency_polygon_graph(column_values.value_counts(),
-                                                 column_values.value_counts().index.tolist(), canvas)
+                graphics.frequency_polygon_graph(column_values.value_counts().sort_values(ascending=False),
+                                                 column_values.value_counts().sort_values(ascending=False).index.tolist(), canvas)
             elif graphs == "Ojivas":
                 graphics.warhead_graph(column_values.value_counts().sort_values(ascending=True),
                                        column_values.value_counts().index.tolist(), canvas)

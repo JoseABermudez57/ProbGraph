@@ -9,7 +9,23 @@ ls = np.array([9,18, 27, 36, 45,54, 63, 72, 81, 90, 99, 108, 117, 126, 135, 144,
 num_classes = 28
 total_data = 4119
 
-
+# print("total de datos", total_value)
+print("--------")
+# print("numero de clases", number_class)
+print("--------")
+# print("datos de la columna", column_values.value_counts())
+print("--------")
+# print("rango", range_method)
+print("--------")
+# print("tamaño de clase", class_width)
+print("--------")
+# print("limite inferior", lower_limits)
+print("--------")
+# print("limite superior", upper_limits)
+print("--------")
+# print("marca de clases", class_marks)
+print("-----")
+# print("frecuencia absoluta", frec_absolute)
 
 print()
 
