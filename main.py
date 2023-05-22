@@ -3,6 +3,8 @@ import pandas as pd
 import services.graphics as graphics
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import services.utils as nc
+
 
 def open_files():
     root = Tk()
@@ -13,7 +15,6 @@ def open_files():
         # Open file process
         content = pd.read_csv(file)
         attributes = content.columns.tolist()
-
         Label(window, text="Seleccione el atributo y el tipo de gráfico que desea realizar").place(x=60, y=130)
         combobox_attributes = ttk.Combobox(window, values=attributes)
         combobox_attributes.place(x=60, y=150)
@@ -26,18 +27,39 @@ def open_files():
             column_values = content[selected_column]
             graphs = combobox_graph.get()
             if graphs == "Histograma":
-                graphics.histogram_plot(column_values.value_counts())
+                total_value = nc.total_value(column_values.value_counts().values.sum())
+                number_class = nc.number_class(total_value)
+                range_method = nc.range_method(column_values.value_counts())
+                class_width = nc.class_width(range_method, number_class)
+                lower_limits = nc.limit_inf(column_values.value_counts().sort_values(ascending=False), class_width)
+                upper_limits = nc.limit_sup(lower_limits, class_width)
+                class_marks = nc.class_marks(lower_limits, upper_limits)
+                print(total_value)
+                print("--------")
+                print(column_values.value_counts())
+                print("--------")
+                print(number_class)
+                print("--------")
+                print(class_marks)
+                print("-----")
+                frec_absolute = nc.frec_absolute(column_values.value_counts(), number_class, class_width)
+                print(frec_absolute)
+                graphics.histogram_plot(frec_absolute, class_marks, canvas)
             elif graphs == "Polígono de frecuencias":
-                graphics.frequency_polygon_graph(column_values.value_counts())
+                graphics.frequency_polygon_graph(column_values.value_counts(),
+                                                 column_values.value_counts().index.tolist(), canvas)
             elif graphs == "Ojivas":
-                graphics.warhead_graph(column_values.value_counts())
+                graphics.warhead_graph(column_values.value_counts().sort_values(ascending=True),
+                                       column_values.value_counts().index.tolist(), canvas)
             elif graphs == "Gráfica de barras":
-                graphics.bar_graph(column_values.value_counts(), canvas)
+                graphics.bar_graph(column_values.value_counts().sort_values(ascending=True),
+                                   column_values.value_counts().sort_values(ascending=True).index.tolist(), canvas)
             else:
-                graphics.pie_chart(column_values.value_counts(), canvas)
+                graphics.pie_chart(column_values.value_counts(), column_values.value_counts().index.tolist(), canvas)
 
         values_button = Button(window, text="Obtener gráfica", command=get_column_values)
         values_button.place(x=60, y=190)
+
 
 # Create the main window
 window = Tk()
