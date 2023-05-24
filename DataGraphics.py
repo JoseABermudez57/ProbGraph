@@ -44,17 +44,11 @@ def bar_graph(data, valueIndex, canvas):
 
 def pie_chart(data,valueIndex, canvas):
     data_pie = data.value_counts()
-    print(data)
-    print(data_pie)
     frequency_relative = do.frequency_relative(data_pie) * 100
     fig, frequency = plt.subplots(figsize=(9.3, 11.6), dpi=60)
-    frequency.pie(frequency_relative, labels=data_pie, autopct='%.0f%%', shadow=True)
-
+    frequency.pie(frequency_relative, labels=data_pie.values[:-1], autopct='%.0f%%', shadow=True)
     print(frequency_relative)
     print(do.frequency_relative(data_pie))
-    # alldata.pie(data_pie[0:], labels=valueIndex, autopct='%.0f%%', shadow=True)
-    # fig, axs = plt.subplots(figsize=(9.3, 6), dpi=60)
-    # axs.pie(data, labels=valueIndex, autopct='%.0f%%', shadow=True)
     frequency.legend(valueIndex, title="Data", loc="upper left")
     canvas.figure = fig
     canvas.draw()

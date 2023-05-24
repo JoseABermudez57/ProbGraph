@@ -51,6 +51,7 @@ def frec_absolute(data, num_classes):
 
 
 def frequency_relative(data):
-    total_data = total_value(sum(data))
-    freq_relative = data[:-1] / total_data
+    print(data)
+    freq_relative = data.values[:-1] / sum(data.values)
+    print(freq_relative)
     return freq_relative
