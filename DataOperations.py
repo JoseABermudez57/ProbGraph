@@ -9,6 +9,8 @@ def number_class(amount_data):
 
 
 def range_method(data):
+    print(max(data))
+    print(min(data))
     rango = max(data) - min(data)
     return rango
 
@@ -46,3 +48,9 @@ def limit_sup(lowerLimits, classWidth):
 def frec_absolute(data, num_classes):
     frequencies, _ = np.histogram(data, bins=num_classes, range=(np.min(data), np.max(data)))
     return frequencies
+
+
+def frequency_relative(data):
+    total_data = total_value(sum(data))
+    freq_relative = data[:-1] / total_data
+    return freq_relative
