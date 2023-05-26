@@ -20,7 +20,6 @@ def frequency_polygon_graph(frecRelative, classMarks, canvas):
     classMarks.insert(0, 0)
     classMarks.append(0)
     frec_relative = frecRelative[0:] * 100
-    print(frec_relative)
     fig, ax = plt.subplots(figsize=(9.3, 11.6), dpi=60)
     x = np.arange(len(classMarks))
     ax.plot(x, frec_relative, marker="o")

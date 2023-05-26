@@ -6,6 +6,7 @@ import pandas as pd
 def number_class(amount_data):
     amount_data = int(amount_data)
     nc = 1 + (3.3 * math.log10(amount_data))
+    print(f'El numero de clases sin redondear es {nc}')
     return nc.__round__()
 
 
