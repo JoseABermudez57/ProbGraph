@@ -1,16 +1,15 @@
 import math
 import numpy as np
+import pandas as pd
 
 
 def number_class(amount_data):
     amount_data = int(amount_data)
-    nc = 1 + 3.3 * math.log(amount_data)
+    nc = 1 + (3.3 * math.log10(amount_data))
     return nc.__round__()
 
 
 def range_method(data):
-    print(max(data))
-    print(min(data))
     rango = max(data) - min(data)
     return rango
 
@@ -45,13 +44,18 @@ def limit_sup(lowerLimits, classWidth):
     return upper_limits
 
 
-def frec_absolute(data, num_classes):
-    frequencies, _ = np.histogram(data, bins=num_classes, range=(np.min(data), np.max(data)))
-    return frequencies
+def frec_absolute(data, lower_limit, upper_limit):
+    ranges = pd.IntervalIndex.from_arrays(lower_limit, upper_limit, closed="both")
+    frequency = pd.cut(data, bins=ranges, include_lowest=True).value_counts().sort_index()
+    # frequencies, _ = np.histogram(data, bins=num_classes - 1, range=(np.min(data), np.max(data)))
+    return frequency
 
 
 def frequency_relative(data):
-    print(data)
-    freq_relative = data.values[:-1] / sum(data.values)
-    print(freq_relative)
+    freq_relative = data.values[0:] / sum(data.values)
     return freq_relative
+
+
+def frequency_relative_accumulate(frecRelative):
+    frec_relative_accum = np.cumsum(frecRelative)
+    return frec_relative_accum
