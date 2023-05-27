@@ -60,6 +60,7 @@ def warhead_graph(column_values, canvas):
     frecRelative = do.frequency_relative(frecAbsolutas)
     frecRelativeAccum = do.frequency_relative_accumulate(frecRelative)
     frec_RelativeAccum = np.insert(frecRelativeAccum, 0, 0)
+    frec_RelativeAccum = frec_RelativeAccum[0:] * 100
     classMarks.insert(0, 0)
     fig, ax = plt.subplots(figsize=(9.3, 11.6), dpi=60)
     x = np.arange(len(classMarks))
