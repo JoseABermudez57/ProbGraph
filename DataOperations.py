@@ -6,7 +6,6 @@ import pandas as pd
 def number_class(amount_data):
     amount_data = int(amount_data)
     nc = 1 + (3.3 * math.log10(amount_data))
-    print(f'El numero de clases sin redondear es {nc}')
     return nc.__round__()
 
 
@@ -35,25 +34,35 @@ def class_marks(limitInf, limitSup):
 
 
 def limit_inf(data, classWidth):
-    lower_limits = np.arange(np.min(data), np.max(data), classWidth + 1)
-    return lower_limits
+    lower_limit = []
+    for i in range(number_class(len(data))):
+        if i == 0:
+            value = min(data)
+        else:
+            value = min(data) + (i * classWidth) + i
+
+        lower_limit.append(value)
+    return lower_limit
 
 
 def limit_sup(lowerLimits, classWidth):
-    lowerLimits = np.array(lowerLimits)
-    upper_limits = lowerLimits + classWidth
-    return upper_limits
+    limits_sup = [limit + classWidth for limit in lowerLimits]
+    return limits_sup
 
 
 def frec_absolute(data, lower_limit, upper_limit):
     ranges = pd.IntervalIndex.from_arrays(lower_limit, upper_limit, closed="both")
     frequency = pd.cut(data, bins=ranges, include_lowest=True).value_counts().sort_index()
-    # frequencies, _ = np.histogram(data, bins=num_classes - 1, range=(np.min(data), np.max(data)))
     return frequency
 
 
+def frec_abs_acumm(frecAbs):
+    frec_relative_accum = np.cumsum(frecAbs)
+    return frec_relative_accum
+
+
 def frequency_relative(data):
-    freq_relative = data.values[0:] / sum(data.values)
+    freq_relative = data[0:] / sum(data)
     return freq_relative
 
 

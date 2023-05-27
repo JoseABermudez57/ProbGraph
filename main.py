@@ -1,5 +1,6 @@
 import os
 from tkinter import Tk, Button, Label, filedialog, ttk, font, Canvas
+import numpy as np
 import pandas as pd
 import DataGraphics as graphics
 import matplotlib.pyplot as plt
@@ -7,9 +8,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import DataOperations as do
 from pandastable import Table
 
-def create_frequency_table(file_name, graph_name,classes, lower_limits, upper_limits, class_marks, rel_frequency
-                           , ab_frequency, ac_frequency):
-    print(f'El numero de clases es {classes} de la columna {graph_name}')
+
+def create_frequency_table(column_values, type_data, graph_name):
 
     canvas = Canvas(window)
     canvas.configure(bg="black")
@@ -24,15 +24,43 @@ def create_frequency_table(file_name, graph_name,classes, lower_limits, upper_li
 
         df.to_csv(file_path, index=False)
 
-    df = pd.DataFrame({
-        "# clase": list(range(1, classes + 1)),
-        "Lim.inf": lower_limits,
-        "Lim.sup": upper_limits,
-        "Marc.Clase": class_marks,
-        "Frec.abs": ab_frequency,
-        "Frec.rel": rel_frequency,
-        "Frec.rel_acum": ac_frequency
-    })
+    if type_data == "object" or type_data == "bool" or (type_data == "int64" and graph_name == "Gráfica de barras") or (type_data == "int64" and graph_name == "Gráfica de pastel"):
+        index = column_values.value_counts().index
+        frec_abs = column_values.value_counts().values
+        frec_relative = do.frequency_relative(frec_abs)
+        frec_rel_acumm = do.frequency_relative_accumulate(frec_relative)
+        frec_abs_acumm = do.frec_abs_acumm(frec_abs)
+        df = pd.DataFrame({
+            "# clase": index,
+            "Frec.abs": frec_abs,
+            "Frec.abs_acum": frec_abs_acumm,
+            "Frec.rel": frec_relative,
+            "Frec.rel_acum": frec_rel_acumm
+        })
+    elif type_data == "int64" or type_data == "float64":
+        total_value = do.total_value(column_values.__len__())
+        range_method = do.range_method(column_values)
+        number_class = do.number_class(total_value)
+        class_width = do.class_width(range_method, number_class)
+        lower_limits = do.limit_inf(column_values, class_width)
+        upper_limits = do.limit_sup(lower_limits, class_width)
+        class_marks = do.class_marks(lower_limits, upper_limits)
+        frec_absolute = do.frec_absolute(column_values, lower_limits, upper_limits)
+        frec_relative = do.frequency_relative(frec_absolute.values)
+        frec_relative_accum = do.frequency_relative_accumulate(frec_relative)
+        frec_abs_acumm = do.frec_abs_acumm(frec_absolute)
+        y = np.arange(1, number_class + 1)
+        print(y)
+        df = pd.DataFrame({
+            "# clase": y,
+            "Lim.inf": lower_limits,
+            "Lim.sup": upper_limits,
+            "Marc.Clase": class_marks,
+            "Frec.abs": frec_absolute,
+            "Frec.abs_acum": frec_abs_acumm,
+            "Frec.rel": frec_relative,
+            "Frec.rel_acum": frec_relative_accum
+        })
 
     export_button = Button(window, text="Export table", command=export_table, font=text_font)
     export_button.configure(bg="black", fg="white", relief="groove", bd=2, highlightthickness=2)
@@ -44,6 +72,7 @@ def create_frequency_table(file_name, graph_name,classes, lower_limits, upper_li
     table.show()
     table.update_idletasks()
     canvas.config(scrollregion=canvas.bbox("all"))
+
 
 def open_files():
     root = Tk()
@@ -81,11 +110,12 @@ def open_files():
 
             is_numeric = all(isinstance(item, (int, float)) for item in column_values)
             is_string = all(isinstance(item, str) for item in column_values)
+            is_boolean = all(isinstance(item, bool) for item in column_values)
 
             if is_numeric:
                 graphics_select = ["Histograma", "Polígono de frecuencias", "Ojivas", "Gráfica de barras",
                                    "Gráfica de pastel"]
-            elif is_string:
+            elif is_string or is_boolean or is_numeric:
                 graphics_select = ["Gráfica de barras", "Gráfica de pastel"]
             else:
                 graphics_select = []
@@ -106,44 +136,25 @@ def open_files():
         def crate_column_graph():
             selected_column = combobox_attributes.get()
             column_values = content[selected_column]
+            type_data = content[selected_column].dtype
 
-            total_value = do.total_value(column_values.__len__())
-            range_method = do.range_method(column_values)
-            number_class = do.number_class(total_value)
-            class_width = do.class_width(range_method, number_class)
-            lower_limits = do.limit_inf(column_values, class_width)
-            upper_limits = do.limit_sup(lower_limits, class_width)
-            class_marks = do.class_marks(lower_limits, upper_limits)
-            frec_absolute = do.frec_absolute(column_values, lower_limits, upper_limits)
-            frec_relative = do.frequency_relative(frec_absolute)
-            frec_relative_accum = do.frequency_relative_accumulate(frec_relative)
             graphs = combobox_graph.get()
-            print(f'El nombre de la gráfica es: {graphs}')
-            print(f'El numero de clases es {number_class}')
-            print(lower_limits.__len__())
-            print(upper_limits.__len__())
-            print(class_marks.__len__())
-            print(frec_relative.__len__())
-            print(frec_absolute.__len__())
-            print(frec_relative_accum.__len__())
 
-            # create_frequency_table(file_name, graph_name,classes, lower_limits, upper_limits, class_marks, rel_frequency
-            #                            , ab_frequency, ac_frequency)
             if graphs == "Histograma":
-                graphics.histogram_plot(frec_absolute, class_marks, canvas)
-                create_frequency_table(file.name, selected_column, number_class, lower_limits, upper_limits, class_marks, frec_relative, frec_absolute, frec_relative_accum)
+                graphics.histogram_plot(column_values, canvas)
+                create_frequency_table(column_values, type_data, graphs)
             elif graphs == "Polígono de frecuencias":
-                graphics.frequency_polygon_graph(frec_relative, class_marks, canvas)
-                create_frequency_table(file.name, selected_column, number_class, lower_limits, upper_limits, class_marks, frec_relative, frec_absolute, frec_relative_accum)
+                graphics.frequency_polygon_graph(column_values, canvas)
+                create_frequency_table(column_values, type_data, graphs)
             elif graphs == "Ojivas":
-                graphics.warhead_graph(frec_relative_accum, class_marks, canvas)
-                create_frequency_table(file.name, selected_column, number_class, lower_limits, upper_limits, class_marks, frec_relative, frec_absolute, frec_relative_accum)
+                graphics.warhead_graph(column_values, canvas)
+                create_frequency_table(column_values, type_data, graphs)
             elif graphs == "Gráfica de barras":
                 graphics.bar_graph(column_values, canvas)
-                create_frequency_table(file.name, selected_column, number_class, lower_limits, upper_limits, class_marks, frec_relative, frec_absolute, frec_relative_accum)
+                create_frequency_table(column_values, type_data, graphs)
             elif graphs == "Gráfica de pastel":
                 graphics.pie_chart(column_values, canvas)
-                create_frequency_table(file.name, selected_column, number_class, lower_limits, upper_limits, class_marks, frec_relative, frec_absolute, frec_relative_accum)
+                create_frequency_table(column_values, type_data, graphs)
             else:
                 selected_graphic = Tk()
                 selected_graphic.geometry("200x200")
