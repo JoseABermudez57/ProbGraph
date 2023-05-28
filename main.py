@@ -127,9 +127,7 @@ def open_files():
             column_values = content[selected_column]
             type_data = content[selected_column].dtype
             print("PARAMETICS")
-            # parametrics
             print(column_values)
-            # group
             number_class = do.number_class(len(column_values))
             range_class = do.range_method(column_values)
             class_width = do.class_width(range_class, number_class)
@@ -147,24 +145,26 @@ def open_files():
             variance_un = do.ungrouped_variance(column_values, arith_mean_not_a)
             standard_deviation = do.standard_deviation(variance_un)
             variance_on = do.grouped_variance(column_values, arith_mean_a)
+            unstandard_deviation = do.unstandard_deviation(variance_on)
             geome_mean = do.ungrouped_geometric_mean(column_values)
-            temporal_mean_a, temporal_mean_not_a = do.temporal_mean(column_values, freq_abs, class_marks)
-            geome_mean_a = do.grouped_geometric_mean(freq_abs, class_marks)
+            truncated = do.half_truncated(column_values, 0.1)
+            temp = do.temporal_mean(column_values, 71)
+
             print("AGRUPADOS")
             print(f'La mediana es {grouped_median}')
             print("Media aritmetica: ", arith_mean_a)
-            print("Media geometrica: ", geome_mean_a)
-            print("Media temporal/truncada", temporal_mean_a)
             print(f'La moda es {grouped_mode}')
             print("Rango: ", range_class)
             print("Max: ", max(column_values))
             print("Min: ", min(column_values))
             print("Varianza: ", variance_on)
+            print(f'La desviacion estandar es: {unstandard_deviation}')
             print(f'El sesgo con datos agrupados es: {grouped_bias}')
             print("NO AGRUPADOS")
             print("Media aritmetica: ", arith_mean_not_a)
             print("Media geometrica: ", geome_mean)
-            print("Media temporal/truncada", temporal_mean_not_a)
+            print("Media truncada: ", truncated)
+            print("Media temporal: ", temp)
             print("Median: ", ungrouped_median)
             print(f'Moda: {ungrouped_mode}')
             print("Rango: ", range_class)
@@ -191,6 +191,7 @@ def open_files():
             elif graphs == "Gráfica de pastel":
                 graphics.pie_chart(column_values, canvas)
                 create_frequency_table(column_values, type_data, graphs)
+                graphics.temporal_mean_g(column_values, 13, canvas)
             else:
                 selected_graphic = Tk()
                 selected_graphic.geometry("200x200")

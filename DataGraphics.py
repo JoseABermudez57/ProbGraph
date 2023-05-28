@@ -93,3 +93,16 @@ def pie_chart(data, canvas):
     fig.savefig("./GraphicsExports/pie-graphic.png")
     canvas.figure = fig
     canvas.draw()
+
+
+def temporal_mean_g(column_values, window,canvas):
+    plt.close()
+    temporal = do.temporal_mean(column_values, window)
+    fig, ax = plt.subplots(figsize=(9.3, 11.6), dpi=60)
+    x = np.arange(len(temporal))
+    ax.plot(column_values)
+    ax.plot(x, temporal)
+    ax.set_xticks(x, labels=temporal)
+    fig.savefig("./GraphicsExports/warhead-graphic.png")
+    canvas.figure = fig
+    canvas.draw()
