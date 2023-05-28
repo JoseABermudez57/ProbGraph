@@ -1,5 +1,5 @@
 import math
-from statistics import median, mode
+from statistics import median, mode, variance, pvariance, median_grouped, geometric_mean
 import numpy as np
 import pandas as pd
 
@@ -80,18 +80,18 @@ def arithmetic_mean(data, type_data):
     ls = limit_sup(li, cw)
     clas_marks = class_marks(li, ls)
     freq_absolute = frec_absolute(data, li, ls)
-    # am = 0
-    # amn = 0
-    # if type_data == "pompadours":
     i = 0
     abs_marks = []
     total = 0
     for freq in freq_absolute.values:
         fm = freq * clas_marks[i]
         abs_marks.append(fm)
-        total = abs_marks[i] + total
+        total = total + abs_marks[i]
         i = i + 1
     am = total / len(data)
+    media = sum(p * f for p, f in zip(clas_marks, freq_absolute)) / sum(freq_absolute)
+    print("mediaaaaa agrupasa", media)
+    # me
     # else:
     i = 0
     sum_total_data_values = sum(data.values[i:])
@@ -99,11 +99,8 @@ def arithmetic_mean(data, type_data):
     return am, amn
 
 
-def grouped_median(class_marks, data):
-    m = sorted(data.values)
-    print(m)
-    len(m)
-    return median(class_marks), median(data.values)
+def grouped_median(class_marks):
+    return median(class_marks)
 
 
 def grouped_mode(class_marks, freq_abs):
@@ -111,8 +108,68 @@ def grouped_mode(class_marks, freq_abs):
     index_max_value = values.index(max(values))
     return class_marks[index_max_value]
 
+
 def ungrouped_median(column_values):
-    return median(column_values)
+    return median(sorted(column_values))
+
 
 def ungrouped_mode(column_values):
     return mode(column_values)
+
+
+def bias(mean, median, mode):
+    if mean < median < mode:
+        return "Sesgado a la derecha"
+    elif mean == median == mode:
+        return "Simétrico"
+    elif mode < median < mean:
+        return "Sesgado a la izquierda"
+    else:
+        return "Indeterminado"
+
+
+def ungrouped_variance(data, mean):
+    return pvariance(data.values, mean)
+
+
+def grouped_variance(data, mean):
+    n = number_class(len(data))
+    r = range_method(data)
+    cw = class_width(r, n)
+    li = limit_inf(data, cw)
+    ls = limit_sup(li, cw)
+    clas_marks = class_marks(li, ls)
+    freq_absolute = frec_absolute(data, li, ls)
+    i = 0
+    abs_marks = []
+    cmq = []
+    total = 0
+    for freq in freq_absolute.values:
+        cmqp = clas_marks[i] ** 2
+        cmq.append(cmqp)
+        fm = freq * cmq[i]
+        abs_marks.append(fm)
+        total = total + abs_marks[i]
+        i = i + 1
+    meanq = mean ** 2
+    print("AADD: ", abs_marks[0:])
+    print("rryttr: ", cmq[0:])
+    print("media asdfsdfsdf: ", meanq)
+    am = total - (len(data) * meanq) / len(data) - 1
+    print("toto", total)
+    print("asdasd", am)
+    return am
+
+
+def ungrouped_geometric_mean(data):
+    media_geometrica = geometric_mean(data)
+    return media_geometrica
+
+
+def temporal(data):
+    serie = pd.Series(data)
+    media_temporal = serie.rolling(window=3).mean()
+    return media_temporal
+
+def standard_deviation(variance):
+    return math.sqrt(variance)

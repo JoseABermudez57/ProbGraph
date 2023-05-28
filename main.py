@@ -1,5 +1,4 @@
 import os
-from statistics import mode, mean, median
 from tkinter import Tk, Button, Label, filedialog, ttk, font, Canvas
 import numpy as np
 import pandas as pd
@@ -86,18 +85,6 @@ def open_files():
 
         content = pd.read_csv(file)
 
-        canvas2 = Canvas(window)
-        canvas2.configure(bg="black")
-
-        canvas2.place(x=0, y=385)
-
-        table = Table(canvas2, dataframe=content)
-        table.configure(background="blue", width=574)
-        table.show()
-
-        table.update_idletasks()
-        canvas2.config(scrollregion=canvas2.bbox("all"))
-
         attributes = content.columns.tolist()
         text_font_t = font.Font(family="Helvetica", size=10, weight="bold")
         label_attribute = Label(window, text="Select attribute", font=text_font_t)
@@ -151,16 +138,42 @@ def open_files():
             class_marks = do.class_marks(lower_limits, upper_limits)
             freq_abs = do.frec_absolute(column_values, lower_limits, upper_limits)
             arith_mean_a, arith_mean_not_a = do.arithmetic_mean(column_values, type_data)
-            grouped_median, not_grouped_median = do.grouped_median(class_marks, column_values)
+            grouped_median = do.grouped_median(class_marks)
+            ungrouped_median = do.ungrouped_median(column_values)
             grouped_mode = do.grouped_mode(class_marks, freq_abs)
+            ungrouped_mode = do.ungrouped_mode(column_values)
+            grouped_bias = do.bias(arith_mean_a, grouped_median, grouped_mode)
+            ungrouped_bias = do.bias(arith_mean_not_a, ungrouped_median, ungrouped_mode)
+            variance_un = do.ungrouped_variance(column_values, arith_mean_not_a)
+            standard_deviation = do.standard_deviation(variance_un)
+            variance_on = do.grouped_variance(column_values, arith_mean_a)
+            geome_mean = do.ungrouped_geometric_mean(column_values)
+            # ungeome_mean = do.grouped_geometric_mean(class_marks, freq_abs)
+            temp = do.temporal(column_values)
+
             print("AGRUPADOS")
             print(f'La mediana es {grouped_median}')
             print("Media aritmetica: ", arith_mean_a)
+            # print("Media geometrica: ", ungeome_mean)
             print(f'La moda es {grouped_mode}')
-
+            print("Rango: ", range_class)
+            print("Max: ", max(column_values))
+            print("Min: ", min(column_values))
+            print("Varianza: ", variance_on)
+            print(f'El sesgo con datos agrupados es: {grouped_bias}')
             print("NO AGRUPADOS")
             print("Media aritmetica: ", arith_mean_not_a)
-            print("Median: ", not_grouped_median)
+            print("Media geometrica: ", geome_mean)
+            print("Media temporal: ", temp)
+            print("Median: ", ungrouped_median)
+            print(f'Moda: {ungrouped_mode}')
+            print("Rango: ", range_class)
+            print("Max: ", max(column_values))
+            print("Min: ", min(column_values))
+            print(f'El sesgo con datos no agrupados es: {ungrouped_bias}')
+            print("Varianza: ", variance_un)
+            print(f'La desviacion estandar es: {standard_deviation}')
+
             graphs = combobox_graph.get()
 
             if graphs == "Histograma":
