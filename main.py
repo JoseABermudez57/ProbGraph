@@ -122,6 +122,30 @@ def open_files():
                                       font=text_font_t)
         combobox_graph.place(x=9, y=170)
 
+        def show_data(grouped_data, ungrouped_data):
+
+            label_grouped_data = Label(window, text=f'DATOS AGRUPADOS\n\n'
+                                                    f'Mediana: {grouped_data["grouped_median"]}\n'
+                                                    f'Media aritmética: {grouped_data["arith_mean_a"]}\n'
+                                                    f'Moda: {grouped_data["grouped_mode"]}\n'
+                                                    f'Rango: {grouped_data["range_class"]}\n'
+                                                    f'Varianza: {grouped_data["variance_on"]}\n'
+                                                    f'El sesgo con datos agruapdos es: {grouped_data["grouped_bias"]}')
+
+            label_ungrouped_data = Label(window, text=f'DATOS NO AGRUPADOS\n\n'
+                                                      f'Media aritmética: {ungrouped_data["arith_mean_not_a"]}\n'
+                                                      f'Media geométrica: {ungrouped_data["geome_mean"]}\n'
+                                                      # f'Media temporal: {ungrouped_data["temp"]}\n'
+                                                      f'Mediana: {ungrouped_data["ungrouped_median"]}\n'
+                                                      f'Moda: {ungrouped_data["ungrouped_mode"]}\n'
+                                                      f'El sesgo con datos no agrupados es: {ungrouped_data["ungrouped_bias"]}\n'
+                                                      f'Varianza: {ungrouped_data["variance_un"]}\n'
+                                                      f'La desviación estandar es: {ungrouped_data["standard_deviation"]}')
+
+            label_grouped_data.place(x=50, y=400)
+            label_ungrouped_data.place(x=350, y=400)
+
+
         def crate_column_graph():
             selected_column = combobox_attributes.get()
             column_values = content[selected_column]
@@ -173,6 +197,29 @@ def open_files():
             print(f'El sesgo con datos no agrupados es: {ungrouped_bias}')
             print("Varianza: ", variance_un)
             print(f'La desviacion estandar es: {standard_deviation}')
+
+            grouped_data = {
+                "grouped_median": grouped_median,
+                "arith_mean_a": arith_mean_a,
+                "grouped_mode": grouped_mode,
+                "range_class": range_class,
+                "variance_on": variance_on,
+                "grouped_bias": grouped_bias
+            }
+
+            ungrouped_data = {
+                "arith_mean_not_a": arith_mean_not_a,
+                "geome_mean": geome_mean,
+                # "temp": temp,
+                "ungrouped_median": ungrouped_median,
+                "ungrouped_mode": ungrouped_mode,
+                "ungrouped_bias": ungrouped_bias,
+                "variance_un": variance_un,
+                "standard_deviation": standard_deviation
+            }
+
+            show_data(grouped_data, ungrouped_data)
+
 
             graphs = combobox_graph.get()
 
