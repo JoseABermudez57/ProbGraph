@@ -89,8 +89,7 @@ def arithmetic_mean(data, type_data):
         total = total + abs_marks[i]
         i = i + 1
     am = total / len(data)
-    media = sum(p * f for p, f in zip(clas_marks, freq_absolute)) / sum(freq_absolute)
-    print("mediaaaaa agrupasa", media)
+    # media = sum(p * f for p, f in zip(clas_marks, freq_absolute)) / sum(freq_absolute)
     # me
     # else:
     i = 0
@@ -146,13 +145,10 @@ def grouped_variance(data, mean):
     total = 0
     for freq in freq_absolute.values:
         cmqp = clas_marks[i] ** 2
-        print(cmqp)
         cmq.append(cmqp)
         fm = freq * cmq[i]
-        print(fm)
         abs_marks.append(fm)
         total = total + abs_marks[i]
-        print(total)
         i = i + 1
     headquarter = mean ** 2
     upper = total - (len(data) * headquarter)
@@ -165,11 +161,60 @@ def ungrouped_geometric_mean(data):
     return media_geometrica
 
 
-def temporal(data):
-    serie = pd.Series(data)
-    media_temporal = serie.rolling(window=3).mean()
-    return media_temporal
-
-
 def standard_deviation(variance):
     return math.sqrt(variance)
+
+
+def grouped_geometric_mean(frec_abs, clas_marks):
+    fc = [f * c for f, c in zip(frec_abs, clas_marks)]
+    fc.remove(0.0)
+    j = 1
+    for i in fc:
+        j = i * j
+    p = 1 / sum(frec_abs.values)
+    g_geometric_mean = j ** (p)
+    return g_geometric_mean
+
+
+def temporal_mean(data, frec_abs, clas_marks):
+    y = 0.2
+    sorted_data = sorted(data)
+    trim_size = int(len(sorted_data) * y)
+    trimmed_data = sorted_data[trim_size: len(sorted_data) - trim_size]
+    trimmed_mean = sum(trimmed_data) / len(trimmed_data)
+    print("termporal: ", trimmed_mean)
+
+    sorted_data = sorted(clas_marks)
+    trim_size = int(sum(frec_abs) * y)
+    lower_limit = 0
+    upper_limit = len(sorted_data)
+
+    for i, freq in enumerate(frec_abs):
+        # fix to resolved
+        if freq >= trim_size:
+            lower_limit = i
+            break
+        trim_size -= freq
+
+    j = 0
+    for i in range(len(frec_abs) - 1, -1, -1):
+        freq = frec_abs.values
+        if trim_size <= freq:
+            upper_limit = i + 1
+            break
+        trim_size -= freq
+
+    trimmed_data = []
+    for i in range(lower_limit, upper_limit):
+        trimmed_data.extend([sorted_data[i]] * frec_abs[i])
+
+    trimmed_mean_a = sum(trimmed_data) / sum(frec_abs[lower_limit:upper_limit])
+    return trimmed_mean_a, trimmed_mean
+
+
+
+    # number_data_to_y = (len(data) * (100 - y)) / 100
+    # number_data_remove = len(data) * (y / 100)
+    # for _ in range(number_data_remove):
+
+    # return "hola"
