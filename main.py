@@ -1,4 +1,5 @@
 import os
+from statistics import mode, mean, median
 from tkinter import Tk, Button, Label, filedialog, ttk, font, Canvas
 import numpy as np
 import pandas as pd
@@ -50,7 +51,8 @@ def create_frequency_table(column_values, type_data, graph_name):
         frec_relative_accum = do.frequency_relative_accumulate(frec_relative)
         frec_abs_acumm = do.frec_abs_acumm(frec_absolute)
         y = np.arange(1, number_class + 1)
-        print(y)
+
+
         df = pd.DataFrame({
             "# clase": y,
             "Lim.inf": lower_limits,
@@ -137,7 +139,28 @@ def open_files():
             selected_column = combobox_attributes.get()
             column_values = content[selected_column]
             type_data = content[selected_column].dtype
+            print("PARAMETICS")
+            # parametrics
+            print(column_values)
+            # group
+            number_class = do.number_class(len(column_values))
+            range_class = do.range_method(column_values)
+            class_width = do.class_width(range_class, number_class)
+            lower_limits = do.limit_inf(column_values, class_width)
+            upper_limits = do.limit_sup(lower_limits, class_width)
+            class_marks = do.class_marks(lower_limits, upper_limits)
+            freq_abs = do.frec_absolute(column_values, lower_limits, upper_limits)
+            arith_mean_a, arith_mean_not_a = do.arithmetic_mean(column_values, type_data)
+            grouped_median, not_grouped_median = do.grouped_median(class_marks, column_values)
+            grouped_mode = do.grouped_mode(class_marks, freq_abs)
+            print("AGRUPADOS")
+            print(f'La mediana es {grouped_median}')
+            print("Media aritmetica: ", arith_mean_a)
+            print(f'La moda es {grouped_mode}')
 
+            print("NO AGRUPADOS")
+            print("Media aritmetica: ", arith_mean_not_a)
+            print("Median: ", not_grouped_median)
             graphs = combobox_graph.get()
 
             if graphs == "Histograma":

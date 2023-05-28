@@ -1,4 +1,5 @@
 import math
+from statistics import median, mode
 import numpy as np
 import pandas as pd
 
@@ -69,3 +70,49 @@ def frequency_relative(data):
 def frequency_relative_accumulate(frecRelative):
     frec_relative_accum = np.cumsum(frecRelative)
     return frec_relative_accum
+
+
+def arithmetic_mean(data, type_data):
+    n = number_class(len(data))
+    r = range_method(data)
+    cw = class_width(r, n)
+    li = limit_inf(data, cw)
+    ls = limit_sup(li, cw)
+    clas_marks = class_marks(li, ls)
+    freq_absolute = frec_absolute(data, li, ls)
+    # am = 0
+    # amn = 0
+    # if type_data == "pompadours":
+    i = 0
+    abs_marks = []
+    total = 0
+    for freq in freq_absolute.values:
+        fm = freq * clas_marks[i]
+        abs_marks.append(fm)
+        total = abs_marks[i] + total
+        i = i + 1
+    am = total / len(data)
+    # else:
+    i = 0
+    sum_total_data_values = sum(data.values[i:])
+    amn = sum_total_data_values / len(data)
+    return am, amn
+
+
+def grouped_median(class_marks, data):
+    m = sorted(data.values)
+    print(m)
+    len(m)
+    return median(class_marks), median(data.values)
+
+
+def grouped_mode(class_marks, freq_abs):
+    values = list(freq_abs.values)
+    index_max_value = values.index(max(values))
+    return class_marks[index_max_value]
+
+def ungrouped_median(column_values):
+    return median(column_values)
+
+def ungrouped_mode(column_values):
+    return mode(column_values)
