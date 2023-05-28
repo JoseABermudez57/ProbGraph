@@ -146,19 +146,18 @@ def grouped_variance(data, mean):
     total = 0
     for freq in freq_absolute.values:
         cmqp = clas_marks[i] ** 2
+        print(cmqp)
         cmq.append(cmqp)
         fm = freq * cmq[i]
+        print(fm)
         abs_marks.append(fm)
         total = total + abs_marks[i]
+        print(total)
         i = i + 1
-    meanq = mean ** 2
-    print("AADD: ", abs_marks[0:])
-    print("rryttr: ", cmq[0:])
-    print("media asdfsdfsdf: ", meanq)
-    am = total - (len(data) * meanq) / len(data) - 1
-    print("toto", total)
-    print("asdasd", am)
-    return am
+    headquarter = mean ** 2
+    upper = total - (len(data) * headquarter)
+    variance_grouped = upper / len(data) - 1
+    return variance_grouped
 
 
 def ungrouped_geometric_mean(data):
@@ -170,6 +169,7 @@ def temporal(data):
     serie = pd.Series(data)
     media_temporal = serie.rolling(window=3).mean()
     return media_temporal
+
 
 def standard_deviation(variance):
     return math.sqrt(variance)
