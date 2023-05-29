@@ -11,10 +11,9 @@ from pandastable import Table
 
 
 def create_frequency_table(column_values, type_data, graph_name):
-
     canvas = Canvas(window)
     canvas.configure(bg="black")
-    canvas.place(x=200, y=7, width=390)
+    canvas.place(x=200, y=6, width=440, height=270)
 
     def export_table():
 
@@ -25,7 +24,8 @@ def create_frequency_table(column_values, type_data, graph_name):
 
         df.to_csv(file_path, index=False)
 
-    if type_data == "object" or type_data == "bool" or (type_data == "int64" and graph_name == "Gráfica de barras") or (type_data == "int64" and graph_name == "Gráfica de pastel"):
+    if type_data == "object" or type_data == "bool" or (type_data == "int64" and graph_name == "Gráfica de barras") or (
+            type_data == "int64" and graph_name == "Gráfica de pastel"):
         index = column_values.value_counts().index
         frec_abs = column_values.value_counts().values
         frec_relative = do.frequency_relative(frec_abs)
@@ -52,7 +52,6 @@ def create_frequency_table(column_values, type_data, graph_name):
         frec_abs_acumm = do.frec_abs_acumm(frec_absolute)
         y = np.arange(1, number_class + 1)
 
-
         df = pd.DataFrame({
             "# clase": y,
             "Lim.inf": lower_limits,
@@ -66,7 +65,7 @@ def create_frequency_table(column_values, type_data, graph_name):
 
     export_button = Button(window, text="Export table", command=export_table, font=text_font)
     export_button.configure(bg="black", fg="white", relief="groove", bd=2, highlightthickness=2)
-    export_button.place(x=250, y=280)
+    export_button.place(x=38, y=250)
 
     table = Table(canvas, dataframe=df)
     table.configure(background="blue")
@@ -148,7 +147,7 @@ def open_files():
 
             return random.choice(conglomerates)
 
-        def show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2):
+        def show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2, xd):
 
             label_grouped_data = Label(window, text=f'DATOS AGRUPADOS\n\n'
                                                     f'Mediana: {grouped_data["grouped_median"]}\n'
@@ -157,46 +156,53 @@ def open_files():
                                                     f'Rango: {grouped_data["range_class"]}\n'
                                                     f'Varianza: {grouped_data["variance_on"]}\n'
                                                     f'Desviacion estandar: {grouped_data["unstandar_deviation"]}\n'
-                                                    f'El sesgo con datos agruapdos es: {grouped_data["grouped_bias"]}')
+                                                    f'Sesgo: {grouped_data["grouped_bias"]}')
 
             label_ungrouped_data = Label(window, text=f'DATOS NO AGRUPADOS\n\n'
                                                       f'Media aritmética: {ungrouped_data["arith_mean_not_a"]}\n'
                                                       f'Media truncada: {ungrouped_data["truncated"]} \n'
                                                       f'Media geométrica: {ungrouped_data["geome_mean"]}\n'
-                                                      # f'Media temporal: {ungrouped_data["temp"]}\n'
+            # f'Media temporal: {ungrouped_data["temp"]}\n'
                                                       f'Mediana: {ungrouped_data["ungrouped_median"]}\n'
                                                       f'Moda: {ungrouped_data["ungrouped_mode"]}\n'
                                                       f'Rango: {ungrouped_data["range_class"]}\n'
-                                                      f'El sesgo con datos no agrupados es: {ungrouped_data["ungrouped_bias"]}\n'
+                                                      f'Sesgo: {ungrouped_data["ungrouped_bias"]}\n'
                                                       f'Varianza: {ungrouped_data["variance_un"]}\n'
-                                                      f'La desviación estandar es: {ungrouped_data["standard_deviation"]}')
+                                                      f'Desviación estandar: {ungrouped_data["standard_deviation"]}')
 
             label_grouped_data2 = Label(window, text=f'DATOS AGRUPADOS\n\n'
-                                                    f'Mediana: {grouped_data2["grouped_median"]}\n'
-                                                    f'Media aritmética: {grouped_data2["arith_mean_a"]}\n'
-                                                    f'Moda: {grouped_data2["grouped_mode"]}\n'
-                                                    f'Rango: {grouped_data2["range_class"]}\n'
-                                                    f'Varianza: {grouped_data2["variance_on"]}\n'
-                                                    f'Desviacion estandar: {grouped_data2["unstandar_deviation"]}\n'
-                                                    f'El sesgo con datos agruapdos es: {grouped_data2["grouped_bias"]}')
+                                                     f'Mediana: {grouped_data2["grouped_median"]}\n'
+                                                     f'Media aritmética: {grouped_data2["arith_mean_a"]}\n'
+                                                     f'Moda: {grouped_data2["grouped_mode"]}\n'
+                                                     f'Rango: {grouped_data2["range_class"]}\n'
+                                                     f'Varianza: {grouped_data2["variance_on"]}\n'
+                                                     f'Desviacion estandar: {grouped_data2["unstandar_deviation"]}\n'
+                                                     f'Sesgo: {grouped_data2["grouped_bias"]}')
 
             label_ungrouped_data2 = Label(window, text=f'DATOS NO AGRUPADOS\n\n'
-                                                      f'Media aritmética: {ungrouped_data2["arith_mean_not_a"]}\n'
-                                                      f'Media truncada: {ungrouped_data2["truncated"]} \n'
-                                                      f'Media geométrica: {ungrouped_data2["geome_mean"]}\n'
-                                                    # f'Media temporal: {ungrouped_data["temp"]}\n'
-                                                      f'Mediana: {ungrouped_data2["ungrouped_median"]}\n'
-                                                      f'Moda: {ungrouped_data2["ungrouped_mode"]}\n'
-                                                      f'Rango: {ungrouped_data2["range_class"]}\n'
-                                                      f'El sesgo con datos no agrupados es: {ungrouped_data2["ungrouped_bias"]}\n'
-                                                      f'Varianza: {ungrouped_data2["variance_un"]}\n'
-                                                      f'La desviación estandar es: {ungrouped_data2["standard_deviation"]}')
+                                                       f'Media aritmética: {ungrouped_data2["arith_mean_not_a"]}\n'
+                                                       f'Media truncada: {ungrouped_data2["truncated"]} \n'
+                                                       f'Media geométrica: {ungrouped_data2["geome_mean"]}\n'
+            # f'Media temporal: {ungrouped_data["temp"]}\n'
+                                                       f'Mediana: {ungrouped_data2["ungrouped_median"]}\n'
+                                                       f'Moda: {ungrouped_data2["ungrouped_mode"]}\n'
+                                                       f'Rango: {ungrouped_data2["range_class"]}\n'
+                                                       f'Sesgo: {ungrouped_data2["ungrouped_bias"]}\n'
+                                                       f'Varianza: {ungrouped_data2["variance_un"]}\n'
+                                                       f'Desviación estandaR: {ungrouped_data2["standard_deviation"]}')
 
-            label_grouped_data.place(x=50, y=400)
-            label_ungrouped_data.place(x=350, y=400)
-            label_grouped_data2.place(x=50, y=500)
-            label_ungrouped_data2.place(x=350, y=500)
-
+            label_title_p = Label(window, text="PARAMETRICOS")
+            label_title_p.place(x=40, y=290, width=600)
+            label_grouped_data.place(x=40, y=315, width=250)
+            label_ungrouped_data.place(x=340, y=315, width=300)
+            temp_button = Button(window, text="Show temporal mean",
+                                 font=text_font)
+            temp_button.configure(bg="black", fg="white", relief="groove", bd=2, highlightthickness=2)
+            temp_button.place(x=88, y=457)
+            label_title_e = Label(window, text="ESTADISTICOS")
+            label_title_e.place(x=40, y=490, width=600)
+            label_grouped_data2.place(x=40, y=515, width=250)
+            label_ungrouped_data2.place(x=340, y=515, width=300)
 
         def data_e_p(column_values, conglomera, type_data):
             number_class = do.number_class(len(column_values))
@@ -288,9 +294,7 @@ def open_files():
                 "variance_un": variance_un2,
                 "standard_deviation": standard_deviation2
             }
-
             return grouped_data, ungrouped_data, grouped_data2, ungrouped_data2
-
 
         def crate_column_graph():
             selected_column = combobox_attributes.get()
@@ -298,9 +302,10 @@ def open_files():
             type_data = content[selected_column].dtype
             conglomera = conglo(column_values)
 
-            grouped_data, ungrouped_data, grouped_data2, ungrouped_data2 = data_e_p(column_values, conglomera, type_data)
+            grouped_data, ungrouped_data, grouped_data2, ungrouped_data2 = data_e_p(column_values, conglomera,
+                                                                                    type_data)
 
-            show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2)
+            show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2, column_values)
             graphs = combobox_graph.get()
 
             if graphs == "Histograma":
@@ -318,7 +323,6 @@ def open_files():
             elif graphs == "Gráfica de pastel":
                 graphics.pie_chart(column_values, canvas)
                 create_frequency_table(column_values, type_data, graphs)
-                graphics.temporal_mean_g(column_values, 13, canvas)
             else:
                 selected_graphic = Tk()
                 selected_graphic.geometry("200x200")

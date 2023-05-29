@@ -95,7 +95,7 @@ def pie_chart(data, canvas):
     canvas.draw()
 
 
-def temporal_mean_g(column_values, window,canvas):
+def temporal_mean_g(column_values, window, canvas):
     plt.close()
     temporal = do.temporal_mean(column_values, window)
     fig, ax = plt.subplots(figsize=(9.3, 11.6), dpi=60)
