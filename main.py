@@ -1,4 +1,5 @@
 import os
+import random
 from tkinter import Tk, Button, Label, filedialog, ttk, font, Canvas
 import numpy as np
 import pandas as pd
@@ -13,7 +14,7 @@ def create_frequency_table(column_values, type_data, graph_name):
 
     canvas = Canvas(window)
     canvas.configure(bg="black")
-    canvas.place(x=200, y=10, width=390)
+    canvas.place(x=200, y=7, width=390)
 
     def export_table():
 
@@ -65,7 +66,7 @@ def create_frequency_table(column_values, type_data, graph_name):
 
     export_button = Button(window, text="Export table", command=export_table, font=text_font)
     export_button.configure(bg="black", fg="white", relief="groove", bd=2, highlightthickness=2)
-    export_button.place(x=250, y=340)
+    export_button.place(x=250, y=280)
 
     table = Table(canvas, dataframe=df)
     table.configure(background="blue")
@@ -122,7 +123,32 @@ def open_files():
                                       font=text_font_t)
         combobox_graph.place(x=9, y=170)
 
-        def show_data(grouped_data, ungrouped_data):
+        def conglo(data):
+            num_samples = len(data)
+            cong_size = 100
+            num_cong = num_samples // cong_size
+            remainder = num_samples % cong_size
+
+            random.shuffle(data)
+
+            conglomerates = []
+
+            start_index = 0
+            for i in range(num_cong):
+                end_index = start_index + cong_size
+
+                cluster = data[start_index:end_index]
+                conglomerates.append(cluster)
+
+                start_index = end_index
+
+            if remainder > 0:
+                last_cluster = data[start_index:]
+                conglomerates.append(last_cluster)
+
+            return random.choice(conglomerates)
+
+        def show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2):
 
             label_grouped_data = Label(window, text=f'DATOS AGRUPADOS\n\n'
                                                     f'Mediana: {grouped_data["grouped_median"]}\n'
@@ -130,28 +156,49 @@ def open_files():
                                                     f'Moda: {grouped_data["grouped_mode"]}\n'
                                                     f'Rango: {grouped_data["range_class"]}\n'
                                                     f'Varianza: {grouped_data["variance_on"]}\n'
+                                                    f'Desviacion estandar: {grouped_data["unstandar_deviation"]}\n'
                                                     f'El sesgo con datos agruapdos es: {grouped_data["grouped_bias"]}')
 
             label_ungrouped_data = Label(window, text=f'DATOS NO AGRUPADOS\n\n'
                                                       f'Media aritmética: {ungrouped_data["arith_mean_not_a"]}\n'
+                                                      f'Media truncada: {ungrouped_data["truncated"]} \n'
                                                       f'Media geométrica: {ungrouped_data["geome_mean"]}\n'
                                                       # f'Media temporal: {ungrouped_data["temp"]}\n'
                                                       f'Mediana: {ungrouped_data["ungrouped_median"]}\n'
                                                       f'Moda: {ungrouped_data["ungrouped_mode"]}\n'
+                                                      f'Rango: {ungrouped_data["range_class"]}\n'
                                                       f'El sesgo con datos no agrupados es: {ungrouped_data["ungrouped_bias"]}\n'
                                                       f'Varianza: {ungrouped_data["variance_un"]}\n'
                                                       f'La desviación estandar es: {ungrouped_data["standard_deviation"]}')
 
+            label_grouped_data2 = Label(window, text=f'DATOS AGRUPADOS\n\n'
+                                                    f'Mediana: {grouped_data2["grouped_median"]}\n'
+                                                    f'Media aritmética: {grouped_data2["arith_mean_a"]}\n'
+                                                    f'Moda: {grouped_data2["grouped_mode"]}\n'
+                                                    f'Rango: {grouped_data2["range_class"]}\n'
+                                                    f'Varianza: {grouped_data2["variance_on"]}\n'
+                                                    f'Desviacion estandar: {grouped_data2["unstandar_deviation"]}\n'
+                                                    f'El sesgo con datos agruapdos es: {grouped_data2["grouped_bias"]}')
+
+            label_ungrouped_data2 = Label(window, text=f'DATOS NO AGRUPADOS\n\n'
+                                                      f'Media aritmética: {ungrouped_data2["arith_mean_not_a"]}\n'
+                                                      f'Media truncada: {ungrouped_data2["truncated"]} \n'
+                                                      f'Media geométrica: {ungrouped_data2["geome_mean"]}\n'
+                                                    # f'Media temporal: {ungrouped_data["temp"]}\n'
+                                                      f'Mediana: {ungrouped_data2["ungrouped_median"]}\n'
+                                                      f'Moda: {ungrouped_data2["ungrouped_mode"]}\n'
+                                                      f'Rango: {ungrouped_data2["range_class"]}\n'
+                                                      f'El sesgo con datos no agrupados es: {ungrouped_data2["ungrouped_bias"]}\n'
+                                                      f'Varianza: {ungrouped_data2["variance_un"]}\n'
+                                                      f'La desviación estandar es: {ungrouped_data2["standard_deviation"]}')
+
             label_grouped_data.place(x=50, y=400)
             label_ungrouped_data.place(x=350, y=400)
+            label_grouped_data2.place(x=50, y=500)
+            label_ungrouped_data2.place(x=350, y=500)
 
 
-        def crate_column_graph():
-            selected_column = combobox_attributes.get()
-            column_values = content[selected_column]
-            type_data = content[selected_column].dtype
-            print("PARAMETICS")
-            print(column_values)
+        def data_e_p(column_values, conglomera, type_data):
             number_class = do.number_class(len(column_values))
             range_class = do.range_method(column_values)
             class_width = do.class_width(range_class, number_class)
@@ -174,29 +221,27 @@ def open_files():
             truncated = do.half_truncated(column_values, 0.1)
             temp = do.temporal_mean(column_values, 71)
 
-            print("AGRUPADOS")
-            print(f'La mediana es {grouped_median}')
-            print("Media aritmetica: ", arith_mean_a)
-            print(f'La moda es {grouped_mode}')
-            print("Rango: ", range_class)
-            print("Max: ", max(column_values))
-            print("Min: ", min(column_values))
-            print("Varianza: ", variance_on)
-            print(f'La desviacion estandar es: {unstandard_deviation}')
-            print(f'El sesgo con datos agrupados es: {grouped_bias}')
-            print("NO AGRUPADOS")
-            print("Media aritmetica: ", arith_mean_not_a)
-            print("Media geometrica: ", geome_mean)
-            print("Media truncada: ", truncated)
-            print("Media temporal: ", temp)
-            print("Median: ", ungrouped_median)
-            print(f'Moda: {ungrouped_mode}')
-            print("Rango: ", range_class)
-            print("Max: ", max(column_values))
-            print("Min: ", min(column_values))
-            print(f'El sesgo con datos no agrupados es: {ungrouped_bias}')
-            print("Varianza: ", variance_un)
-            print(f'La desviacion estandar es: {standard_deviation}')
+            number_class2 = do.number_class(len(conglomera))
+            range_class2 = do.range_method(conglomera)
+            class_width2 = do.class_width(range_class2, number_class2)
+            lower_limits2 = do.limit_inf(conglomera, class_width2)
+            upper_limits2 = do.limit_sup(lower_limits2, class_width2)
+            class_marks2 = do.class_marks(lower_limits2, upper_limits2)
+            freq_abs2 = do.frec_absolute(conglomera, lower_limits2, upper_limits2)
+            arith_mean_a2, arith_mean_not_a2 = do.arithmetic_mean(conglomera, type_data)
+            grouped_median2 = do.grouped_median(class_marks2)
+            ungrouped_median2 = do.ungrouped_median(conglomera)
+            grouped_mode2 = do.grouped_mode(class_marks2, freq_abs2)
+            ungrouped_mode2 = do.ungrouped_mode(conglomera)
+            grouped_bias2 = do.bias(arith_mean_a2, grouped_median2, grouped_mode2)
+            ungrouped_bias2 = do.bias(arith_mean_not_a2, ungrouped_median2, ungrouped_mode2)
+            variance_un2 = do.ungrouped_variance(conglomera, arith_mean_not_a2)
+            standard_deviation2 = do.standard_deviation(variance_un2)
+            variance_on2 = do.grouped_variance(conglomera, arith_mean_a2)
+            unstandard_deviation2 = do.unstandard_deviation(variance_on2)
+            geome_mean2 = do.ungrouped_geometric_mean(conglomera)
+            truncated2 = do.half_truncated(conglomera, 0.1)
+            temp2 = do.temporal_mean(conglomera, 71)
 
             grouped_data = {
                 "grouped_median": grouped_median,
@@ -204,23 +249,58 @@ def open_files():
                 "grouped_mode": grouped_mode,
                 "range_class": range_class,
                 "variance_on": variance_on,
+                "unstandar_deviation": unstandard_deviation,
                 "grouped_bias": grouped_bias
             }
 
             ungrouped_data = {
                 "arith_mean_not_a": arith_mean_not_a,
+                "truncated": truncated,
                 "geome_mean": geome_mean,
                 # "temp": temp,
                 "ungrouped_median": ungrouped_median,
                 "ungrouped_mode": ungrouped_mode,
+                "range_class": range_class,
                 "ungrouped_bias": ungrouped_bias,
                 "variance_un": variance_un,
                 "standard_deviation": standard_deviation
             }
 
-            show_data(grouped_data, ungrouped_data)
+            grouped_data2 = {
+                "grouped_median": grouped_median2,
+                "arith_mean_a": arith_mean_a2,
+                "grouped_mode": grouped_mode,
+                "range_class": range_class2,
+                "variance_on": variance_on2,
+                "unstandar_deviation": unstandard_deviation2,
+                "grouped_bias": grouped_bias2
+            }
+
+            ungrouped_data2 = {
+                "arith_mean_not_a": arith_mean_not_a,
+                "truncated": truncated2,
+                "geome_mean": geome_mean2,
+                # "temp": temp,
+                "ungrouped_median": ungrouped_median2,
+                "ungrouped_mode": ungrouped_mode2,
+                "range_class": range_class2,
+                "ungrouped_bias": ungrouped_bias2,
+                "variance_un": variance_un2,
+                "standard_deviation": standard_deviation2
+            }
+
+            return grouped_data, ungrouped_data, grouped_data2, ungrouped_data2
 
 
+        def crate_column_graph():
+            selected_column = combobox_attributes.get()
+            column_values = content[selected_column]
+            type_data = content[selected_column].dtype
+            conglomera = conglo(column_values)
+
+            grouped_data, ungrouped_data, grouped_data2, ungrouped_data2 = data_e_p(column_values, conglomera, type_data)
+
+            show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2)
             graphs = combobox_graph.get()
 
             if graphs == "Histograma":
