@@ -12,7 +12,6 @@ from pandastable import Table
 
 
 def create_frequency_table(column_values, conglomer, type_data, graph_name):
-
     canvas = Canvas(window)
     canvas.configure(bg="black")
     canvas.place(x=200, y=6, width=440, height=270)
@@ -27,7 +26,9 @@ def create_frequency_table(column_values, conglomer, type_data, graph_name):
         df.to_csv(file_path, index=False)
 
     if (type_data == "int64" and graph_name == "Gráfica de barras") or (
-            type_data == "int64" and graph_name == "Gráfica de pastel"):
+            type_data == "int64" and graph_name == "Gráfica de pastel") or (
+            type_data == "float64" and graph_name == "Gráfica de barras") or (
+            type_data == "float64" and graph_name == "Gráfica de pastel"):
         index = column_values.value_counts().index
         frec_abs = column_values.value_counts().values
         frec_relative = do.frequency_relative(frec_abs)
@@ -59,8 +60,7 @@ def create_frequency_table(column_values, conglomer, type_data, graph_name):
         frec_relative_accum = do.frequency_relative_accumulate(frec_relative)
         frec_abs_acumm = do.frec_abs_acumm(frec_absolute)
         y = np.arange(1, number_class + 1)
-
-        df = pd.DataFrame({
+        df7 = pd.DataFrame({
             "# clase": y,
             "Lim.inf": lower_limits,
             "Lim.sup": upper_limits,
@@ -70,6 +70,12 @@ def create_frequency_table(column_values, conglomer, type_data, graph_name):
             "Frec.rel": frec_relative,
             "Frec.rel_acum": frec_relative_accum
         })
+        table = Table(canvas, dataframe=df7)
+        table.configure(background="blue")
+        table.autoResizeColumns()
+        table.show()
+        table.update_idletasks()
+        canvas.config(scrollregion=canvas.bbox("all"))
     elif type_data == "object" or type_data == "bool":
         index = column_values.value_counts().index
         frec_abs = column_values.value_counts().values
@@ -119,16 +125,10 @@ def create_frequency_table(column_values, conglomer, type_data, graph_name):
         table2.update_idletasks()
         canvas22.config(scrollregion=canvas22.bbox("all"))
 
+    canvas.config(scrollregion=canvas.bbox("all"))
     export_button = Button(window, text="Export table", command=export_table, font=text_font)
     export_button.configure(bg="black", fg="white", relief="groove", bd=2, highlightthickness=2)
     export_button.place(x=38, y=250)
-
-    table = Table(canvas, dataframe=df)
-    table.configure(background="blue")
-    table.autoResizeColumns()
-    table.show()
-    table.update_idletasks()
-    canvas.config(scrollregion=canvas.bbox("all"))
 
 
 def open_files():
@@ -184,18 +184,16 @@ def open_files():
             num_cong = num_samples // cong_size
             remainder = num_samples % cong_size
 
-            random.shuffle(data)
-
             conglomerates = []
 
             start_index = 0
             for i in range(num_cong):
+                start_index = i * cong_size
                 end_index = start_index + cong_size
 
                 cluster = data[start_index:end_index]
-                conglomerates.append(cluster)
 
-                start_index = end_index
+                conglomerates.append(cluster)
 
             if remainder > 0:
                 last_cluster = data[start_index:]
@@ -203,7 +201,8 @@ def open_files():
 
             return random.choice(conglomerates)
 
-        def show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2, type_data, column_values, canvas):
+        def show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2, type_data, column_values, canvas,
+                      conglomera):
             if type_data == "float64" or type_data == "int64":
                 label_grouped_data2 = Label(window, text=f'DATOS AGRUPADOS\n\n'
                                                          f'Mediana: {grouped_data2["grouped_median"]}\n'
@@ -247,20 +246,61 @@ def open_files():
                                                           f'Desviación estandar: {ungrouped_data["standard_deviation"]}')
 
                 def temporal_mean_g():
-                    window = Toplevel()
+                    window = Toplevel(root)
                     window.title("Media temporal")
-                    temporal = np.mean(column_values)
+                    temporal = do.temporal_mean(column_values, 13)
+                    # fig, ax = plt.subplots()
                     fig = Figure(figsize=(6, 4), dpi=100)
                     ax = fig.add_subplot(111)
-                    x = np.arange(len(column_values))
-                    ax.plot(x, column_values, label="Valores")
-                    ax.axhline(temporal, color='r', linestyle='--', label="Media temporal")
+                    x = np.arange(len(temporal))
+                    ax.plot(column_values, label="Valores")
+                    ax.plot(x, temporal, color='r', linestyle='--', label="Media temporal")
                     ax.legend()
-                    fig.savefig("./GraphicsExports/temp.png")
+                    ax.set_xticks(x, labels=temporal)
+                    fig.savefig("./GraphicsExports/warhead-graphic.png")
                     canvas = FigureCanvasTkAgg(fig, master=window)
                     canvas.draw()
                     canvas.get_tk_widget().pack()
                     window.mainloop()
+
+                def show_c():
+                    total_value = do.total_value(conglomera.__len__())
+                    range_method = do.range_method(conglomera)
+                    number_class = do.number_class(total_value)
+                    class_width = do.class_width(range_method, number_class)
+                    lower_limits = do.limit_inf(conglomera, class_width)
+                    upper_limits = do.limit_sup(lower_limits, class_width)
+                    class_marks = do.class_marks(lower_limits, upper_limits)
+                    frec_absolute = do.frec_absolute(conglomera, lower_limits, upper_limits)
+                    frec_relative = do.frequency_relative(frec_absolute.values)
+                    frec_relative_accum = do.frequency_relative_accumulate(frec_relative)
+                    frec_abs_acumm = do.frec_abs_acumm(frec_absolute)
+                    y = np.arange(1, number_class + 1)
+                    print(conglomera.values)
+                    floating_window = Toplevel(window)
+                    floating_window.title("Tabla Flotante")
+                    floating_window.geometry("700x450")
+                    canvas229 = Canvas(floating_window)
+                    canvas229.place(x=40, y=320, width=600, height=370)
+
+                    df29 = pd.DataFrame({
+                        "# clase": y,
+                        "Lim.inf": lower_limits,
+                        "Lim.sup": upper_limits,
+                        "Marc.Clase": class_marks,
+                        "Frec.abs": frec_absolute,
+                        "Frec.abs_acum": frec_abs_acumm,
+                        "Frec.rel": frec_relative,
+                        "Frec.rel_acum": frec_relative_accum
+                    })
+                    table2 = Table(canvas229, dataframe=df29)
+                    table2.configure(background="blue")
+                    table2.autoResizeColumns()
+                    table2.show()
+                    table2.update_idletasks()
+                    canvas229.config(scrollregion=canvas229.bbox("all"))
+                    canvas229.place(x=40, y=20, width=600, height=370)
+                    floating_window.mainloop()
 
                 label_title_p = Label(window, text="PARAMETRICOS")
                 label_title_p.place(x=40, y=290, width=600)
@@ -274,7 +314,12 @@ def open_files():
                                      command=temporal_mean_g, font=text_font)
                 temp_button.configure(bg="black", fg="white", relief="groove", bd=2, highlightthickness=2)
                 temp_button.place(x=88, y=457)
-
+                temp_button2 = Button(window, text="Show conglomerate",
+                                      command=show_c, font=text_font)
+                temp_button2.configure(bg="black", fg="white", relief="groove", bd=2, highlightthickness=2)
+                temp_button2.place(x=88, y=657)
+            else:
+                print(grouped_data2, grouped_data, ungrouped_data, ungrouped_data2)
 
         def data_e_p(column_values, conglomera, type_data, graph):
             if type_data == "float64" or type_data == "int64":
@@ -292,10 +337,12 @@ def open_files():
                 ungrouped_mode = do.ungrouped_mode(column_values)
                 grouped_bias = do.bias(arith_mean_a, grouped_median, grouped_mode)
                 ungrouped_bias = do.bias(arith_mean_not_a, ungrouped_median, ungrouped_mode)
-                variance_un = do.ungrouped_variance(column_values, arith_mean_not_a)
-                standard_deviation = do.standard_deviation(variance_un)
-                variance_on = do.grouped_variance(column_values, arith_mean_a)
-                unstandard_deviation = do.unstandard_deviation(variance_on)
+
+                variance_not_agrup = do.ungrouped_variance(column_values, arith_mean_not_a)
+                standard_deviation = do.standard_deviation(variance_not_agrup)
+                variance_agrup = do.grouped_variance(column_values, arith_mean_a)
+                unstandard_deviation = do.unstandard_deviation(variance_agrup)
+
                 geome_mean = do.ungrouped_geometric_mean(column_values)
                 truncated = do.half_truncated(column_values, 0.1)
                 temp = do.temporal_mean(column_values, 71)
@@ -327,7 +374,7 @@ def open_files():
                     "arith_mean_a": arith_mean_a,
                     "grouped_mode": grouped_mode,
                     "range_class": range_class,
-                    "variance_on": variance_on,
+                    "variance_on": variance_agrup,
                     "unstandar_deviation": unstandard_deviation,
                     "grouped_bias": grouped_bias
                 }
@@ -341,14 +388,14 @@ def open_files():
                     "ungrouped_mode": ungrouped_mode,
                     "range_class": range_class,
                     "ungrouped_bias": ungrouped_bias,
-                    "variance_un": variance_un,
+                    "variance_un": variance_not_agrup,
                     "standard_deviation": standard_deviation
                 }
 
                 grouped_data2 = {
                     "grouped_median": grouped_median2,
                     "arith_mean_a": arith_mean_a2,
-                    "grouped_mode": grouped_mode,
+                    "grouped_mode": grouped_mode2,
                     "range_class": range_class2,
                     "variance_on": variance_on2,
                     "unstandar_deviation": unstandard_deviation2,
@@ -356,7 +403,7 @@ def open_files():
                 }
 
                 ungrouped_data2 = {
-                    "arith_mean_not_a": arith_mean_not_a,
+                    "arith_mean_not_a": arith_mean_not_a2,
                     "truncated": truncated2,
                     "geome_mean": geome_mean2,
                     # "temp": temp,
@@ -370,6 +417,7 @@ def open_files():
                 return grouped_data, ungrouped_data, grouped_data2, ungrouped_data2
             else:
                 create_frequency_table(column_values, conglomera, type_data, graph)
+                return 1, 2, 3, 4
 
         def crate_column_graph():
             selected_column = combobox_attributes.get()
@@ -378,9 +426,12 @@ def open_files():
             conglomera = conglo(column_values)
 
             graphs = combobox_graph.get()
+
             grouped_data, ungrouped_data, grouped_data2, ungrouped_data2 = data_e_p(column_values, conglomera,
                                                                                     type_data, graphs)
-            show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2, type_data, column_values, canvas)
+
+            show_data(grouped_data, ungrouped_data, grouped_data2, ungrouped_data2, type_data, column_values, canvas,
+                      conglomera)
 
             if graphs == "Histograma":
                 graphics.histogram_plot(column_values, canvas)

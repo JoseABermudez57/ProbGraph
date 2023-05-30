@@ -93,7 +93,7 @@ def arithmetic_mean(data, type_data):
     # me
     # else:
     i = 0
-    sum_total_data_values = sum(data.values[i:])
+    sum_total_data_values = sum(data[i:])
     amn = sum_total_data_values / len(data)
     return am, amn
 
@@ -128,7 +128,7 @@ def bias(mean, median, mode):
 
 
 def ungrouped_variance(data, mean):
-    return pvariance(data.values, mean)
+    return pvariance(data, mean)
 
 
 def grouped_variance(data, mean):
@@ -143,22 +143,28 @@ def grouped_variance(data, mean):
     abs_marks = []
     cmq = []
     total = 0
-    for freq in freq_absolute.values:
-        cmqp = clas_marks[i] ** 2
-        cmq.append(cmqp)
-        fm = freq * cmq[i]
-        abs_marks.append(fm)
-        total = total + abs_marks[i]
-        i = i + 1
-    headquarter = mean ** 2
-    upper = total - (len(data) * headquarter)
-    variance_grouped = upper / len(data) - 1
-    return variance_grouped
+
+    fc = [(c ** 2) * f for f, c in zip(freq_absolute.values, clas_marks)]
+    top = sum(fc[0:]) - (len(data) * (mean ** 2))
+    total = top / (len(data) - 1)
+    print("fc", total)
+
+    return total
 
 
 def ungrouped_geometric_mean(data):
-    media_geometrica = geometric_mean(data)
-    return media_geometrica
+    xd = []
+    for x in data:
+        var = x == 0 or x == 0.0
+        xd.append(var)
+    if xd.count(True) >= 1:
+        return 0.0
+    else:
+        try:
+            media_geometrica = geometric_mean(data)
+            return media_geometrica
+        except ValueError:
+            return "No es posible calcular"
 
 
 def standard_deviation(variance_un):
