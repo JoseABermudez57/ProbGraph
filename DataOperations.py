@@ -17,7 +17,7 @@ def range_method(data):
 
 def class_width(rangeMethod, numberClass):
     cw = rangeMethod / numberClass
-    return cw.__round__()
+    return round(cw, 2)
 
 
 def total_value(totalValue):
@@ -106,6 +106,11 @@ def grouped_mode(class_marks, freq_abs):
     values = list(freq_abs.values)
     index_max_value = values.index(max(values))
     return class_marks[index_max_value]
+
+def cualitative_mode(y, freq_abs):
+    values = list(freq_abs)
+    index_max_value = values.index(max(values))
+    return y[index_max_value]
 
 
 def ungrouped_median(column_values):

@@ -1,6 +1,6 @@
 import os
 import random
-from tkinter import Tk, Button, Label, filedialog, ttk, font, Canvas, Toplevel
+from tkinter import Tk, Button, Label, filedialog, ttk, font, Canvas, Toplevel, messagebox
 import numpy as np
 import pandas as pd
 import DataGraphics as graphics
@@ -60,6 +60,7 @@ def create_frequency_table(column_values, conglomer, type_data, graph_name):
         frec_relative_accum = do.frequency_relative_accumulate(frec_relative)
         frec_abs_acumm = do.frec_abs_acumm(frec_absolute)
         y = np.arange(1, number_class + 1)
+        print(f'El ancho de la clase es: {class_width}')
         df7 = pd.DataFrame({
             "# clase": y,
             "Lim.inf": lower_limits,
@@ -82,6 +83,7 @@ def create_frequency_table(column_values, conglomer, type_data, graph_name):
         frec_relative = do.frequency_relative(frec_abs)
         frec_rel_acumm = do.frequency_relative_accumulate(frec_relative)
         frec_abs_acumm = do.frec_abs_acumm(frec_abs)
+        get_cualitative_mode = do.cualitative_mode(index, frec_abs)
         df3 = pd.DataFrame({
             "# clase": index,
             "Frec.abs": frec_abs,
@@ -118,12 +120,14 @@ def create_frequency_table(column_values, conglomer, type_data, graph_name):
             "Frec.rel": frec_relative,
             "Frec.rel_acum": frec_rel_acumm
         })
+
         table2 = Table(canvas22, dataframe=df2)
         table2.configure(background="blue")
         table2.autoResizeColumns()
         table2.show()
         table2.update_idletasks()
         canvas22.config(scrollregion=canvas22.bbox("all"))
+        messagebox.showinfo("Moda", f'La moda de este atributo es {get_cualitative_mode}')
 
     canvas.config(scrollregion=canvas.bbox("all"))
     export_button = Button(window, text="Export table", command=export_table, font=text_font)
